@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'detail_note_screen.dart';
+import 'add_note_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -73,7 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activeAgenda = _selectedAgendaTab == 0 ? _agendaHariIni : _agendaBesok;
+    final activeAgenda = _selectedAgendaTab == 0
+        ? _agendaHariIni
+        : _agendaBesok;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -103,7 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CircleAvatar(
               backgroundColor: const Color(0xFFE8F3EE),
               child: IconButton(
-                icon: const Icon(Icons.notifications_active_outlined, color: Color(0xFF1E3A34), size: 22),
+                icon: const Icon(
+                  Icons.notifications_active_outlined,
+                  color: Color(0xFF1E3A34),
+                  size: 22,
+                ),
                 onPressed: () {},
               ),
             ),
@@ -122,7 +131,10 @@ class _HomeScreenState extends State<HomeScreen> {
           TextField(
             decoration: InputDecoration(
               hintText: 'Cari catatan materi atau tugas...',
-              prefixIcon: const Icon(Icons.search_rounded, color: Colors.black45),
+              prefixIcon: const Icon(
+                Icons.search_rounded,
+                color: Colors.black45,
+              ),
               filled: true,
               fillColor: Colors.white,
               contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -193,9 +205,9 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         onPressed: () {
-          // Akan dihubungkan ke Halaman 4 (Tambah Catatan)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Menuju form Tambah Catatan (Tahap berikutnya)')),
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddNoteScreen()),
           );
         },
       ),
@@ -203,7 +215,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // WIDGET KARTU NOTIFIKASI AGENDA
-  Widget _buildAgendaNotificationSection(List<Map<String, dynamic>> agendaList) {
+  Widget _buildAgendaNotificationSection(
+    List<Map<String, dynamic>> agendaList,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -226,7 +240,11 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Row(
                 children: const [
-                  Icon(Icons.event_note_rounded, size: 20, color: Color(0xFF1E3A34)),
+                  Icon(
+                    Icons.event_note_rounded,
+                    size: 20,
+                    color: Color(0xFF1E3A34),
+                  ),
                   SizedBox(width: 8),
                   Text(
                     'Agenda & Pengingat',
@@ -260,10 +278,14 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isUrgent ? const Color(0xFFFFF2EF) : const Color(0xFFF8F9FA),
+                color: isUrgent
+                    ? const Color(0xFFFFF2EF)
+                    : const Color(0xFFF8F9FA),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isUrgent ? const Color(0xFFE76F51).withOpacity(0.3) : const Color(0xFFE5E7EB),
+                  color: isUrgent
+                      ? const Color(0xFFE76F51).withOpacity(0.3)
+                      : const Color(0xFFE5E7EB),
                 ),
               ),
               child: Row(
@@ -271,11 +293,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isUrgent ? const Color(0xFFE76F51) : const Color(0xFF1E3A34),
+                      color: isUrgent
+                          ? const Color(0xFFE76F51)
+                          : const Color(0xFF1E3A34),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      agenda['type'] == 'Kuliah' ? Icons.menu_book_rounded : Icons.alarm_rounded,
+                      agenda['type'] == 'Kuliah'
+                          ? Icons.menu_book_rounded
+                          : Icons.alarm_rounded,
                       size: 16,
                       color: Colors.white,
                     ),
@@ -290,7 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: isUrgent ? const Color(0xFFC0392B) : const Color(0xFF1E3A34),
+                            color: isUrgent
+                                ? const Color(0xFFC0392B)
+                                : const Color(0xFF1E3A34),
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -298,7 +326,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           '${agenda['time']} • ${agenda['location']}',
                           style: TextStyle(
                             fontSize: 11,
-                            color: isUrgent ? const Color(0xFFE76F51) : Colors.black54,
+                            color: isUrgent
+                                ? const Color(0xFFE76F51)
+                                : Colors.black54,
                           ),
                         ),
                       ],
@@ -346,7 +376,9 @@ class _HomeScreenState extends State<HomeScreen> {
           color: isSelected ? const Color(0xFF1E3A34) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF1E3A34) : const Color(0xFFE5E7EB),
+            color: isSelected
+                ? const Color(0xFF1E3A34)
+                : const Color(0xFFE5E7EB),
           ),
         ),
         child: Text(
@@ -378,7 +410,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: isTugas ? const Color(0xFFFFF2EF) : const Color(0xFFE8F3EE),
+                color: isTugas
+                    ? const Color(0xFFFFF2EF)
+                    : const Color(0xFFE8F3EE),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -386,7 +420,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: isTugas ? const Color(0xFFE76F51) : const Color(0xFF2D6A4F),
+                  color: isTugas
+                      ? const Color(0xFFE76F51)
+                      : const Color(0xFF2D6A4F),
                 ),
               ),
             ),
@@ -418,7 +454,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         onTap: () {
-          // Akan dihubungkan ke Halaman 5 (Detail Catatan)
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailNoteScreen(
+                title: note['title']!,
+                course: note['course']!,
+                date: note['date']!,
+                desc: note['desc']!,
+                type: note['type']!,
+                isReminderActive: true,
+              ),
+            ),
+          );
         },
       ),
     );
