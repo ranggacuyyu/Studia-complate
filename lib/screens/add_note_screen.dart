@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../models/note_model.dart';
+
 class AddNoteScreen extends StatefulWidget {
   const AddNoteScreen({super.key});
 
@@ -8,8 +10,8 @@ class AddNoteScreen extends StatefulWidget {
 }
 
 class _AddNoteScreenState extends State<AddNoteScreen> {
-  // Pilihan Tipe: Catatan Materi atau Tugas Kuliah
-  int _selectedTypeIndex = 0; 
+  // Pilihan Tipe: Catatan Kuliah atau Tugas & Deadline
+  int _selectedTypeIndex = 0;
   String _selectedCourse = 'Pemrograman Mobile';
   String _selectedPriority = 'Sedang';
   bool _enableReminder = true;
@@ -74,6 +76,52 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     }
   }
 
+  void _saveNote() {
+    final title = _titleController.text.trim();
+    final desc = _descController.text.trim();
+
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan masukkan judul catatan atau tugas terlebih dahulu'),
+          backgroundColor: Color(0xFFE76F51),
+        ),
+      );
+      return;
+    }
+
+    final isTugas = _selectedTypeIndex == 1;
+    final formattedTime =
+        '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')} WIB';
+    final formattedDeadline =
+        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year} • $formattedTime';
+
+    final newNote = NoteModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      course: _selectedCourse,
+      date: 'Baru saja',
+      desc: desc.isEmpty ? 'Tidak ada rincian tambahan.' : desc,
+      type: isTugas ? 'Tugas' : 'Materi',
+      deadline: formattedDeadline,
+      isReminderActive: _enableReminder,
+      priority: _selectedPriority,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isTugas
+              ? 'Tugas & tenggat berhasil disimpan ke agenda!'
+              : 'Catatan materi perkuliahan berhasil disimpan!',
+        ),
+        backgroundColor: const Color(0xFF1E3A34),
+      ),
+    );
+
+    Navigator.pop(context, newNote);
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -91,7 +139,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E3A34), size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Color(0xFF1E3A34),
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -140,16 +192,25 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             // 2. INPUT JUDUL CATATAN
             const Text(
               'Judul Catatan',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF1E3A34)),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: Color(0xFF1E3A34),
+              ),
             ),
             const SizedBox(height: 6),
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                hintText: isTugas ? 'Contoh: Laporan Analisis Modul 3' : 'Contoh: Catatan Arsitektur MVVM',
+                hintText: isTugas
+                    ? 'Contoh: Laporan Analisis Modul 3'
+                    : 'Contoh: Catatan Arsitektur MVVM',
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -166,16 +227,27 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             // 3. PILIHAN MATA KULIAH
             const Text(
               'Mata Kuliah',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF1E3A34)),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: Color(0xFF1E3A34),
+              ),
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: _selectedCourse,
+              initialValue: _selectedCourse,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.class_outlined, color: Color(0xFF1E3A34), size: 20),
+                prefixIcon: const Icon(
+                  Icons.class_outlined,
+                  color: Color(0xFF1E3A34),
+                  size: 20,
+                ),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -186,7 +258,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 ),
               ),
               items: _courseList.map((course) {
-                return DropdownMenuItem(value: course, child: Text(course, style: const TextStyle(fontSize: 14)));
+                return DropdownMenuItem(
+                  value: course,
+                  child: Text(course, style: const TextStyle(fontSize: 14)),
+                );
               }).toList(),
               onChanged: (val) {
                 if (val != null) setState(() => _selectedCourse = val);
@@ -204,14 +279,21 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                     children: [
                       Text(
                         isTugas ? 'Batas Pengumpulan' : 'Tanggal Agenda',
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF1E3A34)),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: Color(0xFF1E3A34),
+                        ),
                       ),
                       const SizedBox(height: 6),
                       InkWell(
                         onTap: _pickDate,
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -219,11 +301,18 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.calendar_today_outlined, size: 18, color: Color(0xFF1E3A34)),
+                              const Icon(
+                                Icons.calendar_today_outlined,
+                                size: 18,
+                                color: Color(0xFF1E3A34),
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -239,14 +328,21 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                     children: [
                       const Text(
                         'Waktu / Jam',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF1E3A34)),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: Color(0xFF1E3A34),
+                        ),
                       ),
                       const SizedBox(height: 6),
                       InkWell(
                         onTap: _pickTime,
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -254,11 +350,18 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF1E3A34)),
+                              const Icon(
+                                Icons.access_time_rounded,
+                                size: 18,
+                                color: Color(0xFF1E3A34),
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')} WIB',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -291,7 +394,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                           color: const Color(0xFFE8F3EE),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.notifications_active_rounded, color: Color(0xFF1E3A34), size: 20),
+                        child: const Icon(
+                          Icons.notifications_active_rounded,
+                          color: Color(0xFF1E3A34),
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Column(
@@ -299,7 +406,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                         children: const [
                           Text(
                             'Pasang Notifikasi Pengingat',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E3A34)),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E3A34),
+                            ),
                           ),
                           Text(
                             'Ingatkan pada H-1 dan 2 jam sebelum',
@@ -311,7 +422,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   ),
                   Switch(
                     value: _enableReminder,
-                    activeColor: const Color(0xFF1E3A34),
+                    activeTrackColor: const Color(0xFF1E3A34),
+                    activeThumbColor: Colors.white,
                     onChanged: (val) => setState(() => _enableReminder = val),
                   ),
                 ],
@@ -323,26 +435,42 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             // 6. TINGKAT PRIORITAS
             const Text(
               'Tingkat Urgensi',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF1E3A34)),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: Color(0xFF1E3A34),
+              ),
             ),
             const SizedBox(height: 8),
             Row(
-              children: ['Rendah', 'Sedang', 'Tinggi (Mendesak)'].map((priority) {
+              children: [
+                'Rendah',
+                'Sedang',
+                'Tinggi (Mendesak)',
+              ].map((priority) {
                 final isSelected = _selectedPriority == priority;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ChoiceChip(
                     label: Text(priority),
                     selected: isSelected,
-                    selectedColor: priority.contains('Tinggi') ? const Color(0xFFE76F51) : const Color(0xFF1E3A34),
+                    selectedColor: priority.contains('Tinggi')
+                        ? const Color(0xFFE76F51)
+                        : const Color(0xFF1E3A34),
                     backgroundColor: Colors.white,
-                    side: BorderSide(color: isSelected ? Colors.transparent : const Color(0xFFE5E7EB)),
+                    side: BorderSide(
+                      color: isSelected
+                          ? Colors.transparent
+                          : const Color(0xFFE5E7EB),
+                    ),
                     labelStyle: TextStyle(
                       fontSize: 12,
                       color: isSelected ? Colors.white : Colors.black87,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
-                    onSelected: (_) => setState(() => _selectedPriority = priority),
+                    onSelected: (_) =>
+                        setState(() => _selectedPriority = priority),
                   ),
                 );
               }).toList(),
@@ -353,14 +481,19 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             // 7. ISI CATATAN / INSTRUKSI
             const Text(
               'Rincian Catatan / Instruksi Tugas',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF1E3A34)),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: Color(0xFF1E3A34),
+              ),
             ),
             const SizedBox(height: 6),
             TextField(
               controller: _descController,
               maxLines: 5,
               decoration: InputDecoration(
-                hintText: 'Tuliskan poin-poin materi atau instruksi pengumpulan tugas di sini...',
+                hintText:
+                    'Tuliskan poin-poin materi atau instruksi pengumpulan tugas di sini...',
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.all(16),
@@ -384,23 +517,21 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1E3A34),
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   elevation: 0,
                 ),
                 icon: const Icon(Icons.save_rounded, color: Colors.white, size: 20),
                 label: const Text(
                   'Simpan Agenda & Catatan',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Catatan & notifikasi berhasil dijadwalkan!'),
-                      backgroundColor: Color(0xFF1E3A34),
-                    ),
-                  );
-                  Navigator.pop(context);
-                },
+                onPressed: _saveNote,
               ),
             ),
             const SizedBox(height: 20),
@@ -410,7 +541,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     );
   }
 
-  Widget _buildTypeSegmentBtn({required String label, required IconData icon, required int index}) {
+  Widget _buildTypeSegmentBtn({
+    required String label,
+    required IconData icon,
+    required int index,
+  }) {
     final isSelected = _selectedTypeIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _selectedTypeIndex = index),
@@ -423,7 +558,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 18, color: isSelected ? Colors.white : const Color(0xFF1E3A34)),
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : const Color(0xFF1E3A34),
+            ),
             const SizedBox(width: 8),
             Text(
               label,
